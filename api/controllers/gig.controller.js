@@ -1,10 +1,15 @@
 import Gig from "../models/gig.model.js";
+import User from "../models/user.model.js"
 import createError from "../utils/createError.js";
 
 export const createGig = async (req, res, next) => {
-  if (!req.isSeller)
+let isSeller = false
+ await User.findById(req.body.userId).then(res=>{
+  isSeller = res.isSeller
+ })
+  if (!isSeller)
     return next(createError(403, "Only sellers can create a gig!"));
-
+ 
   const newGig = new Gig({
     userId: req.userId,
     ...req.body,
@@ -18,7 +23,7 @@ export const createGig = async (req, res, next) => {
   }
 };
 export const deleteGig = async (req, res, next) => {
-  try {
+  try { 
     const gig = await Gig.findById(req.params.id);
     if (gig.userId !== req.userId)
       return next(createError(403, "You can delete only your gig!"));

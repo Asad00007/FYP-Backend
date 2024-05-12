@@ -1,6 +1,7 @@
 // user.controller.js
 import createError from "../utils/createError.js";
 import Conversation from "../models/conversation.model.js";
+import User from "../models/user.model.js"
 
 export const createConversation = async (req, res, next) => {
   const newConversation = new Conversation({
@@ -56,9 +57,12 @@ export const getSingleConversation = async (req, res, next) => {
 
 export const getConversations = async (req, res, next) => {
   try {
-    const conversations = await Conversation.find(
+    let conversations = await Conversation.find(
       req.isSeller ? { sellerId: req.userId } : { buyerId: req.userId }
       ).sort({updatedAt:-1});
+    // conversations = conversations.forEach(async(element) => {
+    //   element["buyerName"] = (await User.findOne({_id:element.buyerId}))["username"]
+    //   console.log(element
     res.status(200).send(conversations);
   } catch (err) {
     next(err)
